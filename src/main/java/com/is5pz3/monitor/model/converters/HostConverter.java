@@ -6,6 +6,9 @@ import com.is5pz3.monitor.model.validators.HostValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class HostConverter {
 
@@ -31,5 +34,11 @@ public class HostConverter {
                 .metric(hostEntity.getMetric())
                 .unit(hostEntity.getUnit())
                 .build();
+    }
+
+    public List<Host> toHosts(List<HostEntity> hostEntities) {
+        return hostEntities.stream()
+                .map(this::toHost)
+                .collect(Collectors.toList());
     }
 }
