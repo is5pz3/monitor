@@ -12,5 +12,4 @@ public interface HostsRepository extends JpaRepository<HostEntity, String> {
     List<HostEntity> findByHostNameAndPlatformAndMetricAndUnit(String hostName, String platform, String metric, String unit);
 
     List<HostEntity> findByHostNameContaining(String hostName);
-
 }

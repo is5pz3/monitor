@@ -32,5 +32,4 @@ public class HostConverter {
                 .unit(hostEntity.getUnit())
                 .build();
     }
-
 }
