@@ -80,7 +80,17 @@ class HostsServiceTest extends Specification {
 
         then:
         1 * hostsRepository.findByHostNameContaining(HOST_NAME) >> [hostEntity]
-        1 * hostConverter.toHost(hostEntity) >> host
+        1 * hostConverter.toHosts([hostEntity]) >> [host]
+        assert result == [host]
+    }
+
+    def "should get list of all hosts "() {
+        when:
+        def result = hostsService.getAllHosts()
+
+        then:
+        1 * hostsRepository.findAll() >> [hostEntity]
+        1 * hostConverter.toHosts([hostEntity]) >> [host]
         assert result == [host]
     }
 

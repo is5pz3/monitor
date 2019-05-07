@@ -93,4 +93,41 @@ class MeasurementsServiceTest extends Specification {
         0 * measurementsRepository.saveAll(_)
     }
 
+    def "should get measurements by sensor id"() {
+        given:
+        def measurement1 = new Measurement(TIMESTAMP, VALUE)
+        def measurement2 = new Measurement(TIMESTAMP2, VALUE2)
+        def measurementEntity1 = new MeasurementEntity(timestamp: TIMESTAMP, value: VALUE)
+        def measurementEntity2 = new MeasurementEntity(timestamp: TIMESTAMP2, value: VALUE2)
+        def host = new HostEntity(sensorId: SENSOR_ID)
+        hostsRepository.findBySensorId(SENSOR_ID) >> [host]
+        measurementConverter.toMeasurements([measurementEntity1, measurementEntity2]) >> [measurement1, measurement2]
+
+        when:
+        def result = measurementsService.getMeasurementsBySensorId(SENSOR_ID, null)
+
+        then:
+        1 * measurementsRepository.findByHostEntitySensorId(SENSOR_ID) >> [measurementEntity1, measurementEntity2]
+        result.size() == 2
+        result.containsAll([measurement1, measurement2])
+    }
+
+    def "should get measurements by sensor id with limit"() {
+        given:
+        def measurement1 = new Measurement(TIMESTAMP, VALUE)
+        def measurementEntity1 = new MeasurementEntity(timestamp: TIMESTAMP, value: VALUE)
+        def measurementEntity2 = new MeasurementEntity(timestamp: TIMESTAMP2, value: VALUE2)
+        def host = new HostEntity(sensorId: SENSOR_ID)
+        hostsRepository.findBySensorId(SENSOR_ID) >> [host]
+        measurementConverter.toMeasurements([measurementEntity1, measurementEntity2]) >> [measurement1]
+
+        when:
+        def result = measurementsService.getMeasurementsBySensorId(SENSOR_ID, 1)
+
+        then:
+        1 * measurementsRepository.findByHostEntitySensorId(SENSOR_ID) >> [measurementEntity1, measurementEntity2]
+        result.size() == 1
+        result.containsAll([measurement1])
+    }
+
 }

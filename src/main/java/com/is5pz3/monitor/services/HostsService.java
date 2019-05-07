@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class HostsService {
@@ -25,9 +24,11 @@ public class HostsService {
     }
 
     public List<Host> getHostsByHostName(String hostName) {
-        return hostsRepository.findByHostNameContaining(hostName).stream()
-                .map(hostConverter::toHost)
-                .collect(Collectors.toList());
+        return hostConverter.toHosts(hostsRepository.findByHostNameContaining(hostName));
+    }
+
+    public List<Host> getAllHosts() {
+        return hostConverter.toHosts(hostsRepository.findAll());
     }
 
     private void validateIfHostForSensorDoesNotExists(Host host) {
