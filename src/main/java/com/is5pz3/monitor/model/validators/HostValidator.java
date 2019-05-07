@@ -1,9 +1,11 @@
 package com.is5pz3.monitor.model.validators;
 
 import com.is5pz3.monitor.exceptions.BadRequestException;
+import org.springframework.stereotype.Service;
 
 import java.util.regex.Pattern;
 
+@Service
 public class HostValidator {
 
     private final String SENSOR_ID_REGEX = "[a-zA-Z0-9_]{1,250}";

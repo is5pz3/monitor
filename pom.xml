@@ -18,6 +18,17 @@
 		<java.version>12</java.version>
 	</properties>
 
+	<repositories>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>central</id>
+			<name>bintray</name>
+			<url>https://jcenter.bintray.com</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -46,6 +57,27 @@
 			<version>1.18.6</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.spockframework</groupId>
+			<artifactId>spock-core</artifactId>
+			<version>1.2-groovy-2.4</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.spockframework</groupId>
+			<artifactId>spock-spring</artifactId>
+			<version>1.2-groovy-2.4</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.blogspot.toomuchcoding</groupId>
+			<artifactId>spock-subjects-collaborators-extension</artifactId>
+			<version>1.0.3</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -53,6 +85,18 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.18</version>
+				<configuration>
+					<includes>
+						<include>**/*Test.java</include>
+						<include>**/*Spec.java</include>
+					</includes>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
