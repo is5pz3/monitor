@@ -82,5 +82,4 @@ class HostsControllerTest extends Specification {
         assert result.statusCode == HttpStatus.CREATED
         assert result.body.containsAll([measurement1, measurement2])
     }
-
 }
