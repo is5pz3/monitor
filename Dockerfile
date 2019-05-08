@@ -15,4 +15,4 @@ WORKDIR /root/
 COPY --from=builder /usr/src/myapp/target/monitor-0.0.1-SNAPSHOT.jar .
 
 EXPOSE 8080
-CMD ["java", "-jar", "./monitor-0.0.1-SNAPSHOT.jar"]
+CMD java -jar ./monitor-0.0.1-SNAPSHOT.jar --server.port=$PORT
