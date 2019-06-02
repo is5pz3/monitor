@@ -13,4 +13,4 @@ deploy:
     heroku container:push web --app monitor-prodd;
     heroku container:release web --app monitor-prodd;
   on: 
-    branch: devops
+    branch: master
