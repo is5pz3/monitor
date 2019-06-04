@@ -3,7 +3,6 @@ package com.is5pz3.monitor.controllers;
 import com.is5pz3.monitor.exceptions.BadRequestException;
 import com.is5pz3.monitor.model.data.ComplexMeasurement;
 import com.is5pz3.monitor.model.data.Host;
-import com.is5pz3.monitor.model.data.Measurement;
 import com.is5pz3.monitor.model.data.MeasurementWrapper;
 import com.is5pz3.monitor.services.AuthorizationService;
 import com.is5pz3.monitor.services.HostsService;
@@ -40,7 +39,7 @@ public class MeasurementsController {
     }
 
     private void validateSinceToDates(Long since, Long to) {
-        if(to != null && since != null && to < since) {
+        if (to != null && since != null && to < since) {
             throw new BadRequestException("Since date must be before to date");
         }
     }

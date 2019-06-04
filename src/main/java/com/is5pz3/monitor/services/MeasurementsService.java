@@ -70,7 +70,7 @@ public class MeasurementsService {
 
         ComplexMeasurementEntity complexMeasurement = maybeComplexMeasurement.get();
 
-        if(!complexMeasurement.getUserLogin().equals(userLogin)) {
+        if (!complexMeasurement.getUserLogin().equals(userLogin)) {
             throw new UnauthorizedException("Can't remove this complex measurement. It was created by different user.");
         }
 
@@ -127,6 +127,7 @@ public class MeasurementsService {
     private List<Measurement> getMeasurementsForAnalysis(String sensorId, Long to, ComplexMeasurementEntity complexMeasurement) {
         return measurementConverter.toMeasurements(
                 measurementsRepository.findByHostEntitySensorIdAndTimestampBetween(sensorId, complexMeasurement.getTimestamp() - 60 * complexMeasurement.getTimeWindow(), getTo(to))).stream()
+
                 .sorted(Comparator.comparing(Measurement::getTimestamp))
                 .collect(Collectors.toList());
     }
