@@ -12,11 +12,9 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Getter
-public class ComplexMeasurement {
-    @JsonProperty("complex_measurement_id")
-    private String id;
-
+public class MeasurementWrapper {
     private List<Measurement> measurements;
 
-
+    @JsonProperty("complex_measurements")
+    private ComplexMeasurement complexMeasurement;
 }

@@ -3,8 +3,9 @@ package com.is5pz3.monitor.services;
 import com.is5pz3.monitor.exceptions.UnauthorizedException;
 import com.is5pz3.monitor.model.data.AuthorizationData;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -18,26 +19,31 @@ public class AuthorizationService {
     private String baseUrl;
 
     public String getUserLogin(String token) {
-        String path = "/users/auth?authToken={token}";
+        String path = "/users/auth?authToken=" + token;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+
+        HttpEntity entity = new HttpEntity(headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<AuthorizationData> responseEntity = restTemplate.exchange(baseUrl + path,
-                HttpMethod.GET,
-                null,
-                AuthorizationData.class,
-                token
-        );
+        System.out.println(baseUrl + path);
+        try {
+            ResponseEntity<AuthorizationData> responseEntity = restTemplate.exchange(baseUrl + path,
+                    HttpMethod.GET,
+                    entity,
+                    AuthorizationData.class
+            );
 
-        if (responseEntity.getStatusCode() != HttpStatus.OK) {
+            AuthorizationData authorizationData = responseEntity.getBody();
+            if (authorizationData == null) {
+                throw getUnauthorizedException(token);
+            }
+            return Optional.ofNullable(authorizationData.getLogin())
+                    .orElseThrow(() -> getUnauthorizedException(token));
+        } catch (Exception e) {
             throw getUnauthorizedException(token);
         }
-
-        AuthorizationData authorizationData = responseEntity.getBody();
-        if (authorizationData == null) {
-            throw getUnauthorizedException(token);
-        }
-        return Optional.ofNullable(authorizationData.getLogin())
-                .orElseThrow(() -> getUnauthorizedException(token));
     }
 
     private UnauthorizedException getUnauthorizedException(String token) {

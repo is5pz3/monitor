@@ -5,8 +5,9 @@ import com.blogspot.toomuchcoding.spock.subjcollabs.Subject
 import com.is5pz3.monitor.model.data.ComplexMeasurement
 import com.is5pz3.monitor.model.data.Host
 import com.is5pz3.monitor.model.data.Measurement
+import com.is5pz3.monitor.model.data.MeasurementWrapper
 import com.is5pz3.monitor.services.AuthorizationService
-import com.is5pz3.monitor.services.ComplexMeasurementService
+
 import com.is5pz3.monitor.services.HostsService
 import com.is5pz3.monitor.services.MeasurementsService
 import org.springframework.http.HttpStatus
@@ -33,25 +34,19 @@ class MeasurementsControllerTest extends Specification {
     @Collaborator
     AuthorizationService authorizationService = Mock();
 
-    @Collaborator
-    ComplexMeasurementService complexMeasurementService = Mock()
-
     @Subject
     MeasurementsController measurementsController
 
     def "should get all measurements by sensor id"() {
         given:
-        def measurement1 = new Measurement(TIMESTAMP, VALUE)
-        def measurement2 = new Measurement(TIMESTAMP2, VALUE2)
-        measurementsService.getMeasurementsBySensorId(SENSOR_ID, LIMIT) >> [measurement1, measurement2]
+        def measurementWrapper = new MeasurementWrapper()
+        measurementsService.getMeasurementsBySensorId(SENSOR_ID, LIMIT, null, null) >> measurementWrapper
 
         when:
-        def result = measurementsController.getMeasurementsBySensorId(SENSOR_ID, LIMIT)
+        def result = measurementsController.getMeasurementsBySensorId(SENSOR_ID, LIMIT, null, null)
 
         then:
         result.statusCode == HttpStatus.OK
-        result.body.size() == 2
-        result.body.containsAll([measurement1, measurement2])
     }
 
     def "should get all measurements (info about hosts)"() {
@@ -77,7 +72,7 @@ class MeasurementsControllerTest extends Specification {
 
         then:
         1 * authorizationService.getUserLogin(TOKEN) >> USER_LOGIN
-        1 * complexMeasurementService.saveComplexMeasurement(SENSOR_ID, TIME_WINDOW, CALCULATION_FREQUENCY, USER_LOGIN) >> complexMeasurement
+        1 * measurementsService.saveComplexMeasurement(SENSOR_ID, TIME_WINDOW, CALCULATION_FREQUENCY, USER_LOGIN) >> complexMeasurement
         result.statusCode == HttpStatus.OK
         result.body== complexMeasurement
     }

@@ -32,4 +32,6 @@ public class ComplexMeasurementEntity {
     private Integer timeWindow;
     private Integer calculationFrequency;
 
+    private Long timestamp;
+
 }

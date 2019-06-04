@@ -1,10 +1,11 @@
 package com.is5pz3.monitor.controllers;
 
+import com.is5pz3.monitor.exceptions.BadRequestException;
 import com.is5pz3.monitor.model.data.ComplexMeasurement;
 import com.is5pz3.monitor.model.data.Host;
 import com.is5pz3.monitor.model.data.Measurement;
+import com.is5pz3.monitor.model.data.MeasurementWrapper;
 import com.is5pz3.monitor.services.AuthorizationService;
-import com.is5pz3.monitor.services.ComplexMeasurementService;
 import com.is5pz3.monitor.services.HostsService;
 import com.is5pz3.monitor.services.MeasurementsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +27,22 @@ public class MeasurementsController {
     private MeasurementsService measurementsService;
 
     @Autowired
-    private ComplexMeasurementService complexMeasurementService;
-
-    @Autowired
     AuthorizationService authorizationService;
 
     @RequestMapping(path = "/{sensorId}", method = RequestMethod.GET)
-    public ResponseEntity<List<Measurement>> getMeasurementsBySensorId(@PathVariable String sensorId,
-                                                                       @RequestParam(required = false) Integer limit) {
-        return ResponseEntity.status(HttpStatus.OK).body(measurementsService.getMeasurementsBySensorId(sensorId, limit));
+    public ResponseEntity<MeasurementWrapper> getMeasurementsBySensorId(@PathVariable String sensorId,
+                                                                        @RequestParam(required = false) Integer data_count,
+                                                                        @RequestParam(required = false) Long since,
+                                                                        @RequestParam(required = false) Long to) {
+
+        validateSinceToDates(since, to);
+        return ResponseEntity.status(HttpStatus.OK).body(measurementsService.getMeasurementsBySensorId(sensorId, data_count, since, to));
+    }
+
+    private void validateSinceToDates(Long since, Long to) {
+        if(to != null && since != null && to < since) {
+            throw new BadRequestException("Since date must be before to date");
+        }
     }
 
     @RequestMapping(path = "", method = RequestMethod.GET)
@@ -47,11 +55,7 @@ public class MeasurementsController {
                                                                      @RequestParam @NonNull Integer timeWindow,
                                                                      @RequestParam @NonNull Integer calculationFrequency,
                                                                      @RequestParam @NonNull String token) {
-        return ResponseEntity.status(HttpStatus.OK).body(complexMeasurementService.saveComplexMeasurement(sensorId,
+        return ResponseEntity.status(HttpStatus.OK).body(measurementsService.saveComplexMeasurement(sensorId,
                 timeWindow, calculationFrequency, authorizationService.getUserLogin(token)));
-    }
-
-    public ResponseEntity<Measurement> getComplexMeasurements() {
-
     }
 }
