@@ -20,10 +20,10 @@ class MeasurementsControllerTest extends Specification {
     private static final BigDecimal VALUE2 = 20.0
     private static final long TIMESTAMP = 123L
     private static final long TIMESTAMP2 = 456L
-    public static final int TIME_WINDOW = 5
-    public static final int CALCULATION_FREQUENCY = 1
-    public static final String TOKEN = "token"
-    public static final String USER_LOGIN = "userLogin"
+    private static final int TIME_WINDOW = 5
+    private static final int CALCULATION_FREQUENCY = 1
+    private static final String TOKEN = "token"
+    private static final String USER_LOGIN = "userLogin"
 
     @Collaborator
     HostsService hostsService = Mock()
@@ -75,6 +75,16 @@ class MeasurementsControllerTest extends Specification {
         1 * measurementsService.saveComplexMeasurement(SENSOR_ID, TIME_WINDOW, CALCULATION_FREQUENCY, USER_LOGIN) >> complexMeasurement
         result.statusCode == HttpStatus.OK
         result.body== complexMeasurement
+    }
+
+    def "should delete complex measurements"() {
+        when:
+        def result = measurementsController.deleteMeasurementsBySensorId(SENSOR_ID, TOKEN)
+
+        then:
+        1 * authorizationService.getUserLogin(TOKEN) >> USER_LOGIN
+        1 * measurementsService.removeComplexMeasurement(SENSOR_ID, USER_LOGIN)
+        result.statusCode == HttpStatus.CREATED
     }
 
 }

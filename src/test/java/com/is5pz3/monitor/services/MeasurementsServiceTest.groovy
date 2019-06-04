@@ -3,6 +3,7 @@ package com.is5pz3.monitor.services
 import com.blogspot.toomuchcoding.spock.subjcollabs.Collaborator
 import com.blogspot.toomuchcoding.spock.subjcollabs.Subject
 import com.is5pz3.monitor.exceptions.BadRequestException
+import com.is5pz3.monitor.exceptions.UnauthorizedException
 import com.is5pz3.monitor.model.converters.MeasurementConverter
 import com.is5pz3.monitor.model.data.Measurement
 import com.is5pz3.monitor.model.entities.ComplexMeasurementEntity
@@ -21,6 +22,8 @@ class MeasurementsServiceTest extends Specification {
     private static final long TIMESTAMP = 1L
     private static final long TIMESTAMP2 = 2L
     private static final long TIMESTAMP3 = 3L
+    private static final String USER_LOGIN = "userLogin"
+    private static final String ID = "id"
 
     @Collaborator
     MeasurementsRepository measurementsRepository = Mock()
@@ -182,6 +185,31 @@ class MeasurementsServiceTest extends Specification {
         result.measurements.size() == 3
         result.complexMeasurement.measurements.size() == 10
         result.measurements.containsAll([measurement1, measurement2, measurement3])
+    }
+
+    def "should remove measurement by sensor id"() {
+        given:
+        def complexMeasurement = new ComplexMeasurementEntity(id: ID, userLogin: USER_LOGIN)
+
+        when:
+        measurementsService.removeComplexMeasurement(SENSOR_ID, USER_LOGIN)
+
+        then:
+        1 * complexMeasurementsRepository.findByHostEntitySensorId(SENSOR_ID) >> [complexMeasurement]
+        1 * complexMeasurementsRepository.deleteById(ID)
+    }
+
+    def "should not remove measurement by sensor id if user logins does not match"() {
+        given:
+        def complexMeasurement = new ComplexMeasurementEntity(id: ID, userLogin: USER_LOGIN)
+
+        when:
+        measurementsService.removeComplexMeasurement(SENSOR_ID, "otherUserLogin")
+
+        then:
+        thrown UnauthorizedException
+        1 * complexMeasurementsRepository.findByHostEntitySensorId(SENSOR_ID) >> [complexMeasurement]
+        0 * complexMeasurementsRepository.deleteById(ID)
     }
 
 }

@@ -16,9 +16,9 @@ class MeasurementConverterTest extends Specification {
     private static final long TIMESTAMP2 = 456L
     private static final String SENSOR_ID = "sensorId"
     public static final String ID = "id"
-    public static final int TIME_WINDOW = 5
-    public static final int CALCULATION_FREQUENCY = 1
-    public static final String USER_LOGIN = "userLogin"
+    private static final int TIME_WINDOW = 5
+    private static final int CALCULATION_FREQUENCY = 1
+    private static final String USER_LOGIN = "userLogin"
 
     @Collaborator
     MeasurementValidator measurementValidator = Mock()

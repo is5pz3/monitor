@@ -58,4 +58,11 @@ public class MeasurementsController {
         return ResponseEntity.status(HttpStatus.OK).body(measurementsService.saveComplexMeasurement(sensorId,
                 timeWindow, calculationFrequency, authorizationService.getUserLogin(token)));
     }
+
+    @RequestMapping(path = "/{sensorId}", method = RequestMethod.DELETE)
+    public ResponseEntity deleteMeasurementsBySensorId(@PathVariable String sensorId, @RequestParam @NonNull String token) {
+
+        measurementsService.removeComplexMeasurement(sensorId, authorizationService.getUserLogin(token));
+        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    }
 }
