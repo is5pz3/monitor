@@ -1,6 +1,7 @@
 package com.is5pz3.monitor.services;
 
 import com.is5pz3.monitor.exceptions.BadRequestException;
+import com.is5pz3.monitor.exceptions.UnauthorizedException;
 import com.is5pz3.monitor.model.converters.ComplexMeasurementConverter;
 import com.is5pz3.monitor.model.converters.MeasurementConverter;
 import com.is5pz3.monitor.model.data.ComplexMeasurement;
@@ -60,6 +61,22 @@ public class MeasurementsService {
                 .orElseThrow(() -> getBadRequestException(sensorId));
     }
 
+    public void removeComplexMeasurement(String sensorId, String userLogin) {
+        Optional<ComplexMeasurementEntity> maybeComplexMeasurement = getComplexMeasurement(sensorId);
+
+        if (maybeComplexMeasurement.isEmpty()) {
+            throw new BadRequestException("There is no complex measurement for sensorId: " + sensorId);
+        }
+
+        ComplexMeasurementEntity complexMeasurement = maybeComplexMeasurement.get();
+
+        if (!complexMeasurement.getUserLogin().equals(userLogin)) {
+            throw new UnauthorizedException("Can't remove this complex measurement. It was created by different user.");
+        }
+
+        complexMeasurementsRepository.deleteById(complexMeasurement.getId());
+    }
+
     public MeasurementWrapper getMeasurementsBySensorId(String sensorId, Integer limit, Long since, Long to) {
         if (getHostBySensorId(sensorId).isEmpty()) {
             throw getBadRequestException(sensorId);
@@ -92,10 +109,10 @@ public class MeasurementsService {
 
     private List<Measurement> getComplexMeasurements(Long to, ComplexMeasurementEntity complexMeasurement, List<Measurement> measurementsForComplexAnalysis) {
         List<Measurement> complexMeasurements = new LinkedList<>();
-        long analysisEndDate = to != null ? to : new Date().getTime()/1000;
-        for (long startDate = complexMeasurement.getTimestamp()-60*complexMeasurement.getTimeWindow(); startDate <= analysisEndDate; startDate += 60*complexMeasurement.getCalculationFrequency()) {
+        long analysisEndDate = to != null ? to : new Date().getTime() / 1000;
+        for (long startDate = complexMeasurement.getTimestamp() - 60 * complexMeasurement.getTimeWindow(); startDate <= analysisEndDate; startDate += 60 * complexMeasurement.getCalculationFrequency()) {
             long windowStartDate = startDate;
-            long windowEndDate = startDate + 60*complexMeasurement.getTimeWindow();
+            long windowEndDate = startDate + 60 * complexMeasurement.getTimeWindow();
             OptionalDouble average = measurementsForComplexAnalysis.stream()
                     .filter(measurement -> isInBetween(windowStartDate, windowEndDate, measurement))
                     .map(Measurement::getValue)
@@ -109,7 +126,8 @@ public class MeasurementsService {
 
     private List<Measurement> getMeasurementsForAnalysis(String sensorId, Long to, ComplexMeasurementEntity complexMeasurement) {
         return measurementConverter.toMeasurements(
-                measurementsRepository.findByHostEntitySensorIdAndTimestampBetween(sensorId, complexMeasurement.getTimestamp() - 60*complexMeasurement.getTimeWindow(), getTo(to))).stream()
+                measurementsRepository.findByHostEntitySensorIdAndTimestampBetween(sensorId, complexMeasurement.getTimestamp() - 60 * complexMeasurement.getTimeWindow(), getTo(to))).stream()
+
                 .sorted(Comparator.comparing(Measurement::getTimestamp))
                 .collect(Collectors.toList());
     }
@@ -131,7 +149,7 @@ public class MeasurementsService {
                 .userLogin(userLogin)
                 .timeWindow(timeWindow)
                 .calculationFrequency(calculationFrequency)
-                .timestamp(new Date().getTime()/1000)
+                .timestamp(new Date().getTime() / 1000)
                 .build();
     }
 
