@@ -3,7 +3,6 @@ package com.is5pz3.monitor.model.converters
 import com.blogspot.toomuchcoding.spock.subjcollabs.Collaborator
 import com.blogspot.toomuchcoding.spock.subjcollabs.Subject
 import com.is5pz3.monitor.model.data.Measurement
-import com.is5pz3.monitor.model.entities.ComplexMeasurementEntity
 import com.is5pz3.monitor.model.entities.HostEntity
 import com.is5pz3.monitor.model.entities.MeasurementEntity
 import com.is5pz3.monitor.model.validators.MeasurementValidator
@@ -14,11 +13,6 @@ class MeasurementConverterTest extends Specification {
     private static final BigDecimal VALUE2 = 12.0
     private static final long TIMESTAMP = 123L
     private static final long TIMESTAMP2 = 456L
-    private static final String SENSOR_ID = "sensorId"
-    public static final String ID = "id"
-    private static final int TIME_WINDOW = 5
-    private static final int CALCULATION_FREQUENCY = 1
-    private static final String USER_LOGIN = "userLogin"
 
     @Collaborator
     MeasurementValidator measurementValidator = Mock()
@@ -74,8 +68,8 @@ class MeasurementConverterTest extends Specification {
 
     def "should correctly convert to measurements"() {
         when:
-        def result = measurementConverter.toMeasurements([new MeasurementEntity(timestamp: TIMESTAMP,value: VALUE),
-                                                                 new MeasurementEntity(timestamp: TIMESTAMP2, value: VALUE2)])
+        def result = measurementConverter.toMeasurements([new MeasurementEntity(timestamp: TIMESTAMP, value: VALUE),
+                                                          new MeasurementEntity(timestamp: TIMESTAMP2, value: VALUE2)])
 
         then:
         assert result.size() == 2
@@ -84,24 +78,4 @@ class MeasurementConverterTest extends Specification {
         assert result.get(1).timestamp == TIMESTAMP2
         assert result.get(1).value == VALUE2
     }
-
-    @Subject
-    ComplexMeasurementConverter complexMeasurementConverter
-
-    def "should convert to complex measurement"() {
-        given:
-        def hostEntity = new HostEntity(sensorId: SENSOR_ID)
-
-        when:
-        def result = complexMeasurementConverter.toComplexMeasurement(new ComplexMeasurementEntity(ID, USER_LOGIN, hostEntity, TIME_WINDOW, CALCULATION_FREQUENCY, TIMESTAMP))
-
-        then:
-        assert result.id == ID
-    }
-
-    def "should return null if no complex measurement entity"() {
-        expect:
-        complexMeasurementConverter.toComplexMeasurement(null) == null
-    }
-
 }

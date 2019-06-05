@@ -1,8 +1,8 @@
 package com.is5pz3.monitor.controllers;
 
-import com.is5pz3.monitor.dto.ComplexMeasurementDTO;
 import com.is5pz3.monitor.exceptions.BadRequestException;
 import com.is5pz3.monitor.model.data.ComplexMeasurement;
+import com.is5pz3.monitor.model.data.ComplexMeasurementInput;
 import com.is5pz3.monitor.model.data.Host;
 import com.is5pz3.monitor.model.data.MeasurementWrapper;
 import com.is5pz3.monitor.services.AuthorizationService;
@@ -51,9 +51,8 @@ public class MeasurementsController {
     }
 
     @RequestMapping(path = "", method = RequestMethod.POST)
-    public ResponseEntity<ComplexMeasurement> saveComplexMeasurement(@RequestBody ComplexMeasurementDTO complexMeasurementDTO) {
-        return ResponseEntity.status(HttpStatus.OK).body(measurementsService.saveComplexMeasurement(complexMeasurementDTO.getSensor_id(),
-                complexMeasurementDTO.getTime_window(), complexMeasurementDTO.getCalculation_frequency(), authorizationService.getUserLogin(complexMeasurementDTO.getToken())));
+    public ResponseEntity<ComplexMeasurement> saveComplexMeasurement(@RequestBody ComplexMeasurementInput complexMeasurementInput) {
+        return ResponseEntity.status(HttpStatus.OK).body(measurementsService.saveComplexMeasurement(complexMeasurementInput, authorizationService.getUserLogin(complexMeasurementInput.getToken())));
     }
 
     @RequestMapping(path = "/{sensorId}", method = RequestMethod.DELETE)

@@ -1,5 +1,6 @@
 package com.is5pz3.monitor.services;
 
+import com.is5pz3.monitor.exceptions.BadRequestException;
 import com.is5pz3.monitor.exceptions.UnauthorizedException;
 import com.is5pz3.monitor.model.data.AuthorizationData;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,10 @@ public class AuthorizationService {
     private String baseUrl;
 
     public String getUserLogin(String token) {
+        if(token.isBlank()){
+            throw new BadRequestException("Must provide token!");
+        }
+
         String path = "/users/auth?authToken=" + token;
 
         HttpHeaders headers = new HttpHeaders();
