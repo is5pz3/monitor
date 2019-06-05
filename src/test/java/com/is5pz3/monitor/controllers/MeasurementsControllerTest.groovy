@@ -3,6 +3,7 @@ package com.is5pz3.monitor.controllers
 import com.blogspot.toomuchcoding.spock.subjcollabs.Collaborator
 import com.blogspot.toomuchcoding.spock.subjcollabs.Subject
 import com.is5pz3.monitor.model.data.ComplexMeasurement
+import com.is5pz3.monitor.model.data.ComplexMeasurementInput
 import com.is5pz3.monitor.model.data.Host
 import com.is5pz3.monitor.model.data.Measurement
 import com.is5pz3.monitor.model.data.MeasurementWrapper
@@ -66,13 +67,14 @@ class MeasurementsControllerTest extends Specification {
     def "should post complex measurements"() {
         given:
         def complexMeasurement = new ComplexMeasurement()
+        def complexMeasurementInput = new ComplexMeasurementInput(SENSOR_ID, TIME_WINDOW, CALCULATION_FREQUENCY, TOKEN)
 
         when:
-        def result = measurementsController.saveComplexMeasurement(SENSOR_ID, TIME_WINDOW, CALCULATION_FREQUENCY, TOKEN)
+        def result = measurementsController.saveComplexMeasurement(complexMeasurementInput)
 
         then:
         1 * authorizationService.getUserLogin(TOKEN) >> USER_LOGIN
-        1 * measurementsService.saveComplexMeasurement(SENSOR_ID, TIME_WINDOW, CALCULATION_FREQUENCY, USER_LOGIN) >> complexMeasurement
+        1 * measurementsService.saveComplexMeasurement(complexMeasurementInput, USER_LOGIN) >> complexMeasurement
         result.statusCode == HttpStatus.OK
         result.body== complexMeasurement
     }

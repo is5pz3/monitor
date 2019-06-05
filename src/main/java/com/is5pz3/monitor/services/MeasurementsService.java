@@ -5,6 +5,7 @@ import com.is5pz3.monitor.exceptions.UnauthorizedException;
 import com.is5pz3.monitor.model.converters.ComplexMeasurementConverter;
 import com.is5pz3.monitor.model.converters.MeasurementConverter;
 import com.is5pz3.monitor.model.data.ComplexMeasurement;
+import com.is5pz3.monitor.model.data.ComplexMeasurementInput;
 import com.is5pz3.monitor.model.data.Measurement;
 import com.is5pz3.monitor.model.data.MeasurementWrapper;
 import com.is5pz3.monitor.model.entities.ComplexMeasurementEntity;
@@ -50,15 +51,15 @@ public class MeasurementsService {
                 .orElseThrow(() -> getBadRequestException(sensorId));
     }
 
-    public ComplexMeasurement saveComplexMeasurement(String sensorId, Integer timeWindow, Integer calculationFrequency, String userLogin) {
-        if (getComplexMeasurement(sensorId).isPresent()) {
-            throw new BadRequestException("There is already complex measurement for sensorId: " + sensorId);
+    public ComplexMeasurement saveComplexMeasurement(ComplexMeasurementInput complexMeasurementInput, String userLogin) {
+        if (getComplexMeasurement(complexMeasurementInput.getSensorId()).isPresent()) {
+            throw new BadRequestException("There is already complex measurement for sensorId: " + complexMeasurementInput.getSensorId());
         }
 
-        return getHostBySensorId(sensorId).map(hostEntity ->
-                complexMeasurementsRepository.save(buildComplexMeasurementEntity(hostEntity, timeWindow, calculationFrequency, userLogin)))
+        return getHostBySensorId(complexMeasurementInput.getSensorId()).map(hostEntity ->
+                complexMeasurementsRepository.save(complexMeasurementConverter.toComplexMeasurementEntity(complexMeasurementInput, userLogin, hostEntity)))
                 .map(complexMeasurementConverter::toComplexMeasurement)
-                .orElseThrow(() -> getBadRequestException(sensorId));
+                .orElseThrow(() -> getBadRequestException(complexMeasurementInput.getSensorId()));
     }
 
     public void removeComplexMeasurement(String sensorId, String userLogin) {
@@ -171,6 +172,9 @@ public class MeasurementsService {
     }
 
     private Optional<HostEntity> getHostBySensorId(String sensorId) {
+        if (sensorId.isBlank()) {
+            throw new BadRequestException("sensorId cannot be empty.");
+        }
         return hostsRepository.findBySensorId(sensorId).stream()
                 .findFirst();
     }
