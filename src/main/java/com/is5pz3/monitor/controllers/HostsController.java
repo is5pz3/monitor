@@ -41,4 +41,13 @@ public class HostsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(measurementsService.saveMeasurements(measurements, sensorId));
     }
 
+    @RequestMapping(path = "/{sensorId}", method = RequestMethod.DELETE)
+    public String deleteHost(@PathVariable String sensorId) {
+        if (hostsService.deleteHost(sensorId)) {
+            return "usunięto";
+        } else {
+            return "nie usunięto";
+        }
+    }
+
 }

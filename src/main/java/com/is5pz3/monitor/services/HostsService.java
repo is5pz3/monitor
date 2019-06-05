@@ -27,6 +27,15 @@ public class HostsService {
         return hostConverter.toHosts(hostsRepository.findByHostNameContaining(hostName));
     }
 
+    public boolean deleteHost(String sensorId) {
+        try {
+            hostsRepository.delete(hostsRepository.findBySensorId(sensorId).get(0));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public List<Host> getAllHosts() {
         return hostConverter.toHosts(hostsRepository.findAll());
     }
