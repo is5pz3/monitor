@@ -1,11 +1,19 @@
 sudo: required
-language: generic
+language: java
+jdk:
+  - openjdk-ea
 services:
   - docker
 
 before_install: 
+  - chmod +x mvnw
   - wget -qO- https://toolbelt.heroku.com/install.sh | sh 
   - echo "$HEROKU_PASSWORD" | docker login -u "$HEROKU_USERNAME" --password-stdin registry.heroku.com
+
+install: true
+
+script:
+  - mvn test -B
 
 deploy: 
   provider: script 
